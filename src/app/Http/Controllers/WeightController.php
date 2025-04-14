@@ -1,0 +1,146 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Weight_log;
+use App\Models\Weight_target;
+use App\Http\Requests\WeightLogCreateRequest;
+
+class WeightController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+
+    //  管理画面メソッド
+    public function index()
+    {
+        //　Weight_log モデルを使ってデータを全部取得
+        //　limit()->get(); => データをビューに表示する数を指定する
+    // $weight_logs = Weight_log::limit(8)->get();
+        //　paginate(8); => 1ページあたり8件表示
+        $weight_logs = Weight_log::paginate(8);
+        //　ビューにデータを渡す compact();
+        return view('weight_logs_index',compact('weight_logs'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+
+    //　新規作成フォームメソッド
+    public function create()
+    {
+        return view('weight_logs_create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+
+    //　登録保存メソッド
+    public function store(WeightLogCreateRequest $request)
+    {
+        //　バリデーション済みのデータを取得
+        $data = $request->validated();
+        //　仮ユーザーID(ダミーユーザー)を指定
+        $user_id = 1;
+        //　weight_logs_create　から送信されたデータを$dataに代入
+        $data = $request->all();
+        // 'user_id' を指定した値に設定($user_id)
+        $data['user_id'] = $user_id;
+        //　入力した新規データ($data)をWeight_logモデルのテーブルに登録
+        $product = Weight_log::create($data);
+
+        return redirect()->route('index.weight_logs')->with('success','登録が完了しました。');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+    //  更新フォームメソッド
+    public function edit($id)
+    {
+        //　weight_logモデルからfindOrFail($id) => idのレコードを検索
+        //　レコードが存在 => $weight_logにレコードを格納
+        //　存在しない場合 => ModelNotFoundExceptionを表示 (error)
+        //　findOrFailのメリット => データがない場合、エラーを返すので処理を強制的に停止できる。
+        $weight_log = weight_log::findOrFail($id);
+        return view('weight_logs_update',compact('weight_log'));
+    }
+
+    // 目標体重変更フォームメソッド
+    public function goal_edit(Request $request)
+    {
+        // Weight_target::where('user_id', 1)->first(); => weight_targetsテーブルからuser_id  1 の登録レコードをmodel::whereから取得
+        $weight_target = Weight_target::where('user_id', 1)->first();
+        return view('weight_logs_goal_setting',compact('weight_target'));
+    }
+
+
+    // 目標体重アップデートメソッド
+    public function goal_update(WeightLogCreateRequest $request, $id)
+    {
+        // $weight_target = Weight_target::findOrFail($id); => IDにあた る、weight_targetテーブルのレコードを取得 なければ404エラー
+        // $weight_target->target_weight = $request->input('target_weight'); => フォームから送信されたtarget_weightの値を$weight_targetモデルのtarget_weightカラムに代入
+        // $weight_target->save(); => dbに保存
+        $weight_target = Weight_target::findOrFail($id);
+        $weight_target->target_weight = $request->input('target_weight');
+        //  ↳さらに詳しく!!
+        //  $weight_target->target_weight => このモデルの目標体重に対してという意味
+        //  $request->input('target_weight'); => weight_logs_goal_setting.blade.phpの<input name="target_weight"に入力した値を取得 / target_weightをinputで取得
+        $weight_target->save();
+        return redirect()->route('index.weight_logs')->with('success', '目標体重を更新しました' );
+    }
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+    //  更新登録メソッド
+    public function update(WeightLogCreateRequest $request, $id)
+    {
+        $weight_log = Weight_log::findOrFail($id);
+        // weight_logのテーブルから$fillableで登録されているカラムを取得してdbに保存
+        $weight_log->fill($request->all())->save();
+
+        return redirect()->route('index.weight_logs')->with('success', '体重を更新しました。');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+}
