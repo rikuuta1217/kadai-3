@@ -1,4 +1,4 @@
-# Mogitate
+# PIGLy
 ## 環境設定
 ### 1.Docker build
 
