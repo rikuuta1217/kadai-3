@@ -18,7 +18,7 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     // ログイン後の遷移ページ
-    public const HOME = '/weight_logs/index';
+    public const HOME = '/weight_logs';
 
     /**
      * The controller namespace for the application.

@@ -17,12 +17,12 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 |
 */
 
-Route::get('/', function () {
-    return view('/layouts/app');
-});
-Route::get('/login', function () {
-    return view('auth/login');
-});
+// Route::get('/', function () {
+//     return view('/layouts/app');
+// });
+// Route::get('/login', function () {
+//     return view('auth/login');
+// });
 
 
 // Route::get('/login', [AuthenticatedSessionController::class, 'create'])->middleware(['guest'])->name('login');
@@ -31,7 +31,7 @@ Route::get('/login', function () {
 Route::middleware('auth')->group(function () {
 
 //　管理画面
-Route::get('/weight_logs/index', [WeightController::class,'index'])->name('index.weight_logs');
+Route::get('/weight_logs', [WeightController::class,'index'])->name('index.weight_logs');
 //　新規入力画面
 Route::get('/weight_logs/create', [WeightController::class,'create'])->name('create.weight_logs');
 //　更新入力画面
