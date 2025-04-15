@@ -56,13 +56,13 @@
 
 ## URL(view)
 
-ログイン：http://localhost/login
+ログイン：http://localhost/weight_logs
 
 ### ログイン (ID・PASSWORD)
 
 ID:demo@icloud.com
 
-PW:kamisama
+PW:password
 
 ## 補足事項
 
