@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Weight_log;
 use App\Models\Weight_target;
 use App\Http\Requests\WeightLogCreateRequest;
@@ -63,15 +64,34 @@ class WeightController extends Controller
         return redirect()->route('index.weight_logs')->with('success','登録が完了しました。');
     }
 
+
+    public function search(Request $request)
+    {
+        $userId = Auth::id();
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $weight_logs=Weight_log::with('user')->where('user_id', $userId)->DateSearch($startDate, $endDate)->Paginate(8)->appends([
+            'start_date'=>$startDate,
+            'end_date'=>$endDate
+        ]);
+
+        $latestWeightLog = Weight_log::where('user_id', $userId)->latest()->first();
+        $weightTarget = Weight_target::where('user_id', $userId)->latest()->first();
+
+        return view('weight_logs_index', compact('weight_logs', 'weightTarget', 'latestWeightLog', 'startDate', 'endDate'));
+    }
     /**
      * Display the specified resource.
+     *
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        //
+        $weightLogs = Weight_log::findOrFail($id);
+        return view('weight_logs_detail', compact('weightLogs'));
     }
 
     /**
@@ -141,6 +161,8 @@ class WeightController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $weightLogs = Weight_log::findOrFail($id);
+        $weightLogs->delete();
+        return redirect()->route('index.weight_logs')->with('success', 'データを削除しました');
     }
 }

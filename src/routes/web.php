@@ -34,6 +34,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/weight_logs', [WeightController::class,'index'])->name('index.weight_logs');
 //　新規入力画面
 Route::get('/weight_logs/create', [WeightController::class,'create'])->name('create.weight_logs');
+// 検索フォーム
+Route::get('weight_logs/search', [WeightController::class, 'search'])->name('search.weight_logs');
+//　詳細表示ルート
+Route::get('/weight_logs/{id}', [WeightController::class,'show'])->name('show.weight_logs');
 //　更新入力画面
 //　{weight_log} => 送信されたidをアドレスに表示
 Route::get('/weight_logs/{weight_log}/edit',[WeightController::class,'edit'])->name('edit.weight_logs');
@@ -46,6 +50,8 @@ Route::get('/weight_logs/goal_setting',[WeightController::class,'goal_edit'])->n
 // 体重変更処理ルート
 // putでdb更新できなかったので、一時的にpost送信
 Route::post('/weight_logs/{id}/update',[WeightController::class,'goal_update'])->name('weight_logs.goal_update');
+// 管理画面削除フォーム
+Route::delete('/weight_logs/{id}',[WeightController::class, 'destroy'])->name('weight_logs.destroy');
 // ログイン時のアカウント新規作成フォーム
 // Route::get('/register-new',[ProfileController::class, 'registerCreate'])->name('register.new');
 // // ログイン時のアカウント新規作成フォーム登録処理
