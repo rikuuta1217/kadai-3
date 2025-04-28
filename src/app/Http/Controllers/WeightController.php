@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Weight_log;
 use App\Models\Weight_target;
 use App\Http\Requests\WeightLogCreateRequest;
+use App\Http\Requests\WeightLogTargetRequest;
 
 class WeightController extends Controller
 {
@@ -15,17 +16,48 @@ class WeightController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    //  新規体重登録メソッド
+    public function weight()
+    {
+        return view('auth.register2');
+    }
+
+    //　新規体重登録保存
+    public function storeWeight(Request $request)
+    {
+        $createdAt=now();
+        $formattedDate=$createdAt->format('Y/m/d');
+        $userId = Auth::id();
+
+        Weight_log::create([
+            'user_id' => $userId,
+            'weight' => $request->weight,
+            'date' => $formattedDate,
+        ]);
+
+        Weight_target::create([
+            'user_id' => $userId,
+            'target_weight' => $request->target_weight,
+        ]);
+
+        return redirect()->route('index.weight_logs');
+    }
 
     //  管理画面メソッド
     public function index()
     {
-        //　Weight_log モデルを使ってデータを全部取得
-        //　limit()->get(); => データをビューに表示する数を指定する
-    // $weight_logs = Weight_log::limit(8)->get();
-        //　paginate(8); => 1ページあたり8件表示
-        $weight_logs = Weight_log::paginate(8);
-        //　ビューにデータを渡す compact();
-        return view('weight_logs_index',compact('weight_logs'));
+
+        $userId = Auth::id(); // ログイン中のユーザーIDを取得
+        // ログインユーザーの体重記録を最新順で8件ずつ取得 (ページネーション付き)
+        $weight_logs = Weight_log::where('user_id', $userId)->orderBy('date', 'desc')->paginate(8);
+        // dd($weight_logs);
+        // 最新の体重記録 (1件)
+        $latestWeightLog = Weight_log::where('user_id', $userId)->first();
+
+        // 最新の目標体重 (1件)
+        $weightTarget = Weight_target::where('user_id', $userId)->latest()->first();
+
+        return view('weight_logs_index',compact('weight_logs', 'latestWeightLog', 'weightTarget'));
     }
 
     /**
@@ -53,7 +85,7 @@ class WeightController extends Controller
         //　バリデーション済みのデータを取得
         $data = $request->validated();
         //　仮ユーザーID(ダミーユーザー)を指定
-        $user_id = 1;
+        $user_id = Auth::id();
         //　weight_logs_create　から送信されたデータを$dataに代入
         $data = $request->all();
         // 'user_id' を指定した値に設定($user_id)
@@ -115,14 +147,14 @@ class WeightController extends Controller
     // 目標体重変更フォームメソッド
     public function goal_edit(Request $request)
     {
-        // Weight_target::where('user_id', 1)->first(); => weight_targetsテーブルからuser_id  1 の登録レコードをmodel::whereから取得
-        $weight_target = Weight_target::where('user_id', 1)->first();
+        $userId = Auth::id();
+        $weight_target = Weight_target::where('user_id', $userId)->first();
         return view('weight_logs_goal_setting',compact('weight_target'));
     }
 
 
     // 目標体重アップデートメソッド
-    public function goal_update(WeightLogCreateRequest $request, $id)
+    public function goal_update(WeightLogTargetRequest $request, $id)
     {
         // $weight_target = Weight_target::findOrFail($id); => IDにあた る、weight_targetテーブルのレコードを取得 なければ404エラー
         // $weight_target->target_weight = $request->input('target_weight'); => フォームから送信されたtarget_weightの値を$weight_targetモデルのtarget_weightカラムに代入
@@ -147,7 +179,7 @@ class WeightController extends Controller
     public function update(WeightLogCreateRequest $request, $id)
     {
         $weight_log = Weight_log::findOrFail($id);
-        // weight_logのテーブルから$fillableで登録されているカラムを取得してdbに保存
+        // weight_logのテーブルから$fillableで登録されているカラムを## 1週目取得してdbに保存
         $weight_log->fill($request->all())->save();
 
         return redirect()->route('index.weight_logs')->with('success', '体重を更新しました。');

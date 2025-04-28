@@ -18,7 +18,7 @@ class Weight_logSeeder extends Seeder
         Weight_log::truncate();
         // user_id 1 のユーザーに紐づくログを35件作成
         Weight_log::factory()->count(35)->create([
-            'user_id' => 1W
+            'user_id' => 1
         ]);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateWeightLogsTable extends Migration
 {
     /**
+     * 
      * Run the migrations.
      *
      * @return void
@@ -18,13 +19,13 @@ class CreateWeightLogsTable extends Migration
             //  foreignId('外部テーブルID') => ('外部テーブルID')を外部キーとして作成
             //  constrained() => 外部キーが参照するテーブル('外部テーブルID') を自動で推測して制約を設定する要素
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->date('date')->notNull(false);               //日付
+            $table->date('date');               //日付
             //  decimal('',4,1) => 小数点の固定カラム
             //　最大4桁の数値を格納 / 小数点以下1桁を保tu
-            $table->decimal('weight', 4, 1)->notNull(false);    //体重
-            $table->integer('calories');                        //食事量
-            $table->time('exercise_time');                      //運動時間
-            $table->text('exercise_content');                   //運動内容
+            $table->decimal('weight', 4, 1);    //体重
+            $table->integer('calories')->nullable();                        //食事量
+            $table->time('exercise_time')->nullable();                      //運動時間
+            $table->text('exercise_content')->nullable();                   //運動内容
             $table->timestamps();
         });
     }

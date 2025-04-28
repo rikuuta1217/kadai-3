@@ -16,7 +16,7 @@ class CreateWeightTargetsTable extends Migration
         Schema::create('weight_targets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->decimal('target_weight', 4, 1)->notNull(false);           //目標体重
+            $table->decimal('target_weight', 4, 1);           //目標体重
             $table->timestamps();
         });
     }

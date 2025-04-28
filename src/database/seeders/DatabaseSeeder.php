@@ -15,11 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call([
-            UserSeeder::class,
-            Weight_logSeeder::class,
-            Weight_targetSeeder::class,
-        ]);
+        // $this->call([
+        //     UserSeeder::class,
+        //     Weight_logSeeder::class,
+        //     Weight_targetSeeder::class,
+        // ]);
 
         $this->call(UserSeeder::class);
         Weight_log::factory(35)->create();
